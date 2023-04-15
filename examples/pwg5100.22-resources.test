@@ -1,0 +1,701 @@
+#
+# Resource tests for conformance with PWG 5100.22-2019
+#
+# Usage:
+#
+#   ./ipptool -tIf FILENAME system-uri pwg5100.22-resources.test
+#
+# Copyright © 2022 by the Printer Working Group.
+#
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+# information.
+#
+
+{
+    NAME "Get-Resources (default)"
+    OPERATION Get-Resources
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri system-uri $uri
+
+    STATUS successful-ok
+
+    EXPECT date-time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE dateTime|no-value COUNT 1
+    EXPECT date-time-at-creation IN-GROUP resource-attributes-tag OF-TYPE dateTime COUNT 1
+    EXPECT date-time-at-installed IN-GROUP resource-attributes-tag OF-TYPE dateTime|no-value COUNT 1
+    EXPECT resource-data-uri IN-GROUP resource-attributes-tag OF-TYPE uri|no-value COUNT 1
+    EXPECT resource-format IN-GROUP resource-attributes-tag OF-TYPE mimeMediaType COUNT 1
+    EXPECT resource-id IN-GROUP resource-attributes-tag OF-TYPE integer(1:MAX) COUNT 1
+    EXPECT resource-info IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1
+    EXPECT resource-k-octets IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1
+    EXPECT resource-name IN-GROUP resource-attributes-tag OF-TYPE name COUNT 1
+    EXPECT ?resource-natural-language IN-GROUP resource-attributes-tag OF-TYPE naturalLanguage COUNT 1
+    EXPECT ?resource-patches IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT ?resource-signature IN-GROUP resource-attributes-tag OF-TYPE octetString
+    EXPECT resource-state IN-GROUP resource-attributes-tag OF-TYPE enum COUNT 1
+    EXPECT resource-state-message IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1
+    EXPECT resource-state-reasons IN-GROUP resource-attributes-tag OF-TYPE keyword
+    EXPECT resource-string-version IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT resource-type IN-GROUP resource-attributes-tag OF-TYPE keyword COUNT 1
+    EXPECT resource-use-count IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1
+    EXPECT resource-uuid IN-GROUP resource-attributes-tag OF-TYPE uri COUNT 1
+    EXPECT resource-version IN-GROUP resource-attributes-tag OF-TYPE octetString(64)|no-value COUNT 1
+    EXPECT time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE integer|no-value COUNT 1
+    EXPECT time-at-creation IN-GROUP resource-attributes-tag OF-TYPE integer COUNT 1
+    EXPECT time-at-installed IN-GROUP resource-attributes-tag OF-TYPE integer|no-value COUNT 1
+}
+
+{
+    NAME "Get-Resources ('all')"
+    OPERATION Get-Resources
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri system-uri $uri
+    ATTR keyword requested-attributes all
+
+    STATUS successful-ok
+
+    EXPECT date-time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE dateTime|no-value COUNT 1
+    EXPECT date-time-at-creation IN-GROUP resource-attributes-tag OF-TYPE dateTime COUNT 1
+    EXPECT date-time-at-installed IN-GROUP resource-attributes-tag OF-TYPE dateTime|no-value COUNT 1
+    EXPECT resource-data-uri IN-GROUP resource-attributes-tag OF-TYPE uri|no-value COUNT 1
+    EXPECT resource-format IN-GROUP resource-attributes-tag OF-TYPE mimeMediaType COUNT 1
+    EXPECT resource-id IN-GROUP resource-attributes-tag OF-TYPE integer(1:MAX) COUNT 1
+    EXPECT resource-info IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1
+    EXPECT resource-k-octets IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1
+    EXPECT resource-name IN-GROUP resource-attributes-tag OF-TYPE name COUNT 1
+    EXPECT ?resource-natural-language IN-GROUP resource-attributes-tag OF-TYPE naturalLanguage COUNT 1
+    EXPECT ?resource-patches IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT ?resource-signature IN-GROUP resource-attributes-tag OF-TYPE octetString
+    EXPECT resource-state IN-GROUP resource-attributes-tag OF-TYPE enum COUNT 1
+    EXPECT resource-state-message IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1
+    EXPECT resource-state-reasons IN-GROUP resource-attributes-tag OF-TYPE keyword
+    EXPECT resource-string-version IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT resource-type IN-GROUP resource-attributes-tag OF-TYPE keyword COUNT 1
+    EXPECT resource-use-count IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1
+    EXPECT resource-uuid IN-GROUP resource-attributes-tag OF-TYPE uri COUNT 1
+    EXPECT resource-version IN-GROUP resource-attributes-tag OF-TYPE octetString(64)|no-value COUNT 1
+    EXPECT time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE integer|no-value COUNT 1
+    EXPECT time-at-creation IN-GROUP resource-attributes-tag OF-TYPE integer COUNT 1
+    EXPECT time-at-installed IN-GROUP resource-attributes-tag OF-TYPE integer|no-value COUNT 1
+}
+
+{
+    NAME "Get-Resources ('resource-description')"
+    OPERATION Get-Resources
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri system-uri $uri
+    ATTR keyword requested-attributes resource-description
+
+    STATUS successful-ok
+
+    EXPECT !date-time-at-canceled
+    EXPECT !date-time-at-creation
+    EXPECT !date-time-at-installed
+    EXPECT !resource-data-uri
+    EXPECT !resource-format
+    EXPECT !resource-id
+    EXPECT resource-info IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1
+    EXPECT !resource-k-octets
+    EXPECT resource-name IN-GROUP resource-attributes-tag OF-TYPE name COUNT 1
+    EXPECT !resource-natural-language
+    EXPECT !resource-patches
+    EXPECT !resource-signature
+    EXPECT !resource-state
+    EXPECT !resource-state-message
+    EXPECT !resource-state-reasons
+    EXPECT !resource-string-version
+    EXPECT !resource-type
+    EXPECT !resource-use-count
+    EXPECT !resource-uuid
+    EXPECT !resource-version
+    EXPECT !time-at-canceled
+    EXPECT !time-at-creation
+    EXPECT !time-at-installed
+}
+
+{
+    NAME "Get-Resources ('resource-status')"
+    OPERATION Get-Resources
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri system-uri $uri
+    ATTR keyword requested-attributes resource-status
+
+    STATUS successful-ok
+
+    EXPECT date-time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE dateTime|no-value COUNT 1
+    EXPECT date-time-at-creation IN-GROUP resource-attributes-tag OF-TYPE dateTime COUNT 1
+    EXPECT date-time-at-installed IN-GROUP resource-attributes-tag OF-TYPE dateTime|no-value COUNT 1
+    EXPECT resource-data-uri IN-GROUP resource-attributes-tag OF-TYPE uri|no-value COUNT 1
+    EXPECT resource-format IN-GROUP resource-attributes-tag OF-TYPE mimeMediaType COUNT 1
+    EXPECT resource-id IN-GROUP resource-attributes-tag OF-TYPE integer(1:MAX) COUNT 1
+    EXPECT !resource-info
+    EXPECT resource-k-octets IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1
+    EXPECT !resource-name
+    EXPECT ?resource-natural-language IN-GROUP resource-attributes-tag OF-TYPE naturalLanguage COUNT 1
+    EXPECT ?resource-patches IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT ?resource-signature IN-GROUP resource-attributes-tag OF-TYPE octetString
+    EXPECT resource-state IN-GROUP resource-attributes-tag OF-TYPE enum COUNT 1
+    EXPECT resource-state-message IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1
+    EXPECT resource-state-reasons IN-GROUP resource-attributes-tag OF-TYPE keyword
+    EXPECT resource-string-version IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT resource-type IN-GROUP resource-attributes-tag OF-TYPE keyword COUNT 1
+    EXPECT resource-use-count IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1
+    EXPECT resource-uuid IN-GROUP resource-attributes-tag OF-TYPE uri COUNT 1
+    EXPECT resource-version IN-GROUP resource-attributes-tag OF-TYPE octetString(64)|no-value COUNT 1
+    EXPECT time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE integer|no-value COUNT 1
+    EXPECT time-at-creation IN-GROUP resource-attributes-tag OF-TYPE integer COUNT 1
+    EXPECT time-at-installed IN-GROUP resource-attributes-tag OF-TYPE integer|no-value COUNT 1
+}
+
+{
+    NAME "Get-Resources ('resource-description','resource-status')"
+    OPERATION Get-Resources
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri system-uri $uri
+    ATTR keyword requested-attributes resource-description,resource-status
+
+    STATUS successful-ok
+
+    EXPECT date-time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE dateTime|no-value COUNT 1
+    EXPECT date-time-at-creation IN-GROUP resource-attributes-tag OF-TYPE dateTime COUNT 1
+    EXPECT date-time-at-installed IN-GROUP resource-attributes-tag OF-TYPE dateTime|no-value COUNT 1
+    EXPECT resource-data-uri IN-GROUP resource-attributes-tag OF-TYPE uri|no-value COUNT 1
+    EXPECT resource-format IN-GROUP resource-attributes-tag OF-TYPE mimeMediaType COUNT 1
+    EXPECT resource-id IN-GROUP resource-attributes-tag OF-TYPE integer(1:MAX) COUNT 1
+    EXPECT resource-info IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1
+    EXPECT resource-k-octets IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1
+    EXPECT resource-name IN-GROUP resource-attributes-tag OF-TYPE name COUNT 1
+    EXPECT ?resource-natural-language IN-GROUP resource-attributes-tag OF-TYPE naturalLanguage COUNT 1
+    EXPECT ?resource-patches IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT ?resource-signature IN-GROUP resource-attributes-tag OF-TYPE octetString
+    EXPECT resource-state IN-GROUP resource-attributes-tag OF-TYPE enum COUNT 1
+    EXPECT resource-state-message IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1
+    EXPECT resource-state-reasons IN-GROUP resource-attributes-tag OF-TYPE keyword
+    EXPECT resource-string-version IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT resource-type IN-GROUP resource-attributes-tag OF-TYPE keyword COUNT 1
+    EXPECT resource-use-count IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1
+    EXPECT resource-uuid IN-GROUP resource-attributes-tag OF-TYPE uri COUNT 1
+    EXPECT resource-version IN-GROUP resource-attributes-tag OF-TYPE octetString(64)|no-value COUNT 1
+    EXPECT time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE integer|no-value COUNT 1
+    EXPECT time-at-creation IN-GROUP resource-attributes-tag OF-TYPE integer COUNT 1
+    EXPECT time-at-installed IN-GROUP resource-attributes-tag OF-TYPE integer|no-value COUNT 1
+}
+
+{
+    NAME "Get-Resources ('resource-id','resource-description')"
+    OPERATION Get-Resources
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri system-uri $uri
+    ATTR keyword requested-attributes resource-id,resource-description
+
+    STATUS successful-ok
+
+    EXPECT !date-time-at-canceled
+    EXPECT !date-time-at-creation
+    EXPECT !date-time-at-installed
+    EXPECT !resource-data-uri
+    EXPECT !resource-format
+    EXPECT resource-id IN-GROUP resource-attributes-tag OF-TYPE integer(1:MAX) COUNT 1
+    EXPECT resource-info IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1
+    EXPECT !resource-k-octets
+    EXPECT resource-name IN-GROUP resource-attributes-tag OF-TYPE name COUNT 1
+    EXPECT !resource-natural-language
+    EXPECT !resource-patches
+    EXPECT !resource-signature
+    EXPECT !resource-state
+    EXPECT !resource-state-message
+    EXPECT !resource-state-reasons
+    EXPECT !resource-string-version
+    EXPECT !resource-type
+    EXPECT !resource-use-count
+    EXPECT !resource-uuid
+    EXPECT !resource-version
+    EXPECT !time-at-canceled
+    EXPECT !time-at-creation
+    EXPECT !time-at-installed
+}
+
+{
+    NAME "Get-System-Attributes ('resource-type=supported')"
+    OPERATION Get-System-Attributes
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR keyword requested-attributes resource-type-supported
+
+    STATUS successful-ok
+    EXPECT resource-type-supported IN-GROUP system-attributes-tag OF-TYPE keyword
+    EXPECT resource-type-supported WITH-VALUE static-icc-profile DEFINE-MATCH HAVE_ICC
+    EXPECT resource-type-supported WITH-VALUE static-image DEFINE-MATCH HAVE_IMAGE
+    EXPECT resource-type-supported WITH-VALUE static-strings DEFINE-MATCH HAVE_STRINGS
+}
+
+{
+    SKIP-IF-NOT-DEFINED HAVE_IMAGE
+
+    NAME "Create-Resource (Icon Image)"
+    OPERATION Create-Resource
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR keyword resource-type static-image
+    GROUP resource-attributes-tag
+	ATTR name resource-name "Icon Image"
+	ATTR text resource-info "5100.22 Icon Image"
+
+    STATUS successful-ok
+    EXPECT resource-id IN-GROUP resource-attributes-tag OF-TYPE integer(1:MAX) COUNT 1
+    EXPECT resource-id DEFINE-VALUE ICON_RESOURCE_ID
+}
+{
+    SKIP-IF-NOT-DEFINED HAVE_IMAGE
+    SKIP-IF-NOT-DEFINED ICON_RESOURCE_ID
+
+    NAME "Send-Resource-Data (Icon Image)"
+    OPERATION Send-Resource-Data
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR integer resource-id $ICON_RESOURCE_ID
+	ATTR mimeMediaType resource-format image/png
+    FILE icon.png
+
+    STATUS successful-ok
+}
+{
+    SKIP-IF-NOT-DEFINED HAVE_IMAGE
+    SKIP-IF-NOT-DEFINED ICON_RESOURCE_ID
+
+    NAME "Install-Resource (Icon Image)"
+    OPERATION Install-Resource
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR integer resource-id $ICON_RESOURCE_ID
+
+    STATUS successful-ok
+}
+
+{
+    NAME "Create-Printer (Resource Printer)"
+    OPERATION Create-Printer
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR keyword printer-service-type print
+	ATTR integer resource-ids $ICON_RESOURCE_ID
+    GROUP printer-attributes-tag
+	ATTR name printer-name "Resource Printer"
+	ATTR text printer-info "5100.22 Resource Printer"
+	ATTR text printer-location "Test Location"
+	ATTR uri printer-geo-location "geo:46.4707,-80.9961"
+
+    STATUS successful-ok
+    EXPECT printer-id IN-GROUP printer-attributes-tag OF-TYPE integer(1:MAX) COUNT 1
+    EXPECT printer-id DEFINE-VALUE PRINTER_ID
+    EXPECT printer-is-accepting-jobs IN-GROUP printer-attributes-tag OF-TYPE boolean COUNT 1
+    EXPECT printer-state IN-GROUP printer-attributes-tag OF-TYPE enum COUNT 1
+    EXPECT printer-state-reasons IN-GROUP printer-attributes-tag OF-TYPE keyword
+    EXPECT printer-uuid IN-GROUP printer-attributes-tag OF-TYPE uri COUNT 1
+    EXPECT printer-xri-supported IN-GROUP printer-attributes-tag OF-TYPE collection
+    EXPECT printer-xri-supported/xri-uri OF-TYPE uri COUNT 1
+    EXPECT printer-xri-supported/xri-uri DEFINE-VALUE PRINTER_URI
+}
+
+{
+    SKIP-IF-NOT-DEFINED HAVE_ICC
+
+    NAME "Create-Resource (ICC Profile)"
+    OPERATION Create-Resource
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR keyword resource-type static-icc-profile
+    GROUP resource-attributes-tag
+	ATTR name resource-name "sRGB ICC Profile"
+	ATTR text resource-info "5100.22 sRGB ICC Profile Resource"
+
+    STATUS successful-ok
+    EXPECT resource-id IN-GROUP resource-attributes-tag OF-TYPE integer(1:MAX) COUNT 1
+    EXPECT resource-id DEFINE-VALUE ICC_RESOURCE_ID
+}
+{
+    SKIP-IF-NOT-DEFINED HAVE_ICC
+    SKIP-IF-NOT-DEFINED ICC_RESOURCE_ID
+
+    NAME "Send-Resource-Data (ICC Profile)"
+    OPERATION Send-Resource-Data
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR integer resource-id $ICC_RESOURCE_ID
+	ATTR mimeMediaType resource-format application/vnd.iccprofile
+    FILE srgb.icc
+
+    STATUS successful-ok
+}
+{
+    SKIP-IF-NOT-DEFINED HAVE_ICC
+    SKIP-IF-NOT-DEFINED ICC_RESOURCE_ID
+
+    NAME "Get-Resource-Attributes (ICC Profile)"
+    OPERATION Get-Resource-Attributes
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri system-uri $uri
+    ATTR integer resource-id $ICC_RESOURCE_ID
+    ATTR keyword requested-attributes all
+
+    STATUS successful-ok
+
+    EXPECT date-time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE no-value COUNT 1
+    EXPECT date-time-at-creation IN-GROUP resource-attributes-tag OF-TYPE dateTime COUNT 1
+    EXPECT date-time-at-installed IN-GROUP resource-attributes-tag OF-TYPE no-value COUNT 1
+    EXPECT resource-data-uri IN-GROUP resource-attributes-tag OF-TYPE uri COUNT 1
+    EXPECT resource-format IN-GROUP resource-attributes-tag OF-TYPE mimeMediaType COUNT 1 WITH-VALUE application/vnd.iccprofile
+    EXPECT resource-id IN-GROUP resource-attributes-tag OF-TYPE integer(1:MAX) COUNT 1 WITH-VALUE $ICC_RESOURCE_ID
+    EXPECT resource-info IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1 WITH-VALUE "5100.22 sRGB ICC Profile Resource"
+    EXPECT resource-k-octets IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1 WITH-VALUE 1
+    EXPECT resource-name IN-GROUP resource-attributes-tag OF-TYPE name COUNT 1 WITH-VALUE "sRGB ICC Profile"
+    EXPECT ?resource-natural-language IN-GROUP resource-attributes-tag OF-TYPE naturalLanguage COUNT 1
+    EXPECT ?resource-patches IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT ?resource-signature IN-GROUP resource-attributes-tag OF-TYPE octetString
+    EXPECT resource-state IN-GROUP resource-attributes-tag OF-TYPE enum COUNT 1 WITH-VALUE 4
+    EXPECT resource-state-message IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1
+    EXPECT resource-state-reasons IN-GROUP resource-attributes-tag OF-TYPE keyword
+    EXPECT resource-string-version IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT resource-type IN-GROUP resource-attributes-tag OF-TYPE keyword COUNT 1 WITH-VALUE "static-icc-profile"
+    EXPECT resource-use-count IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1 WITH-VALUE 0
+    EXPECT resource-uuid IN-GROUP resource-attributes-tag OF-TYPE uri COUNT 1
+    EXPECT resource-version IN-GROUP resource-attributes-tag OF-TYPE octetString(64)|no-value COUNT 1
+    EXPECT time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE no-value COUNT 1
+    EXPECT time-at-creation IN-GROUP resource-attributes-tag OF-TYPE integer COUNT 1
+    EXPECT time-at-installed IN-GROUP resource-attributes-tag OF-TYPE no-value COUNT 1
+}
+{
+    SKIP-IF-NOT-DEFINED HAVE_ICC
+    SKIP-IF-NOT-DEFINED ICC_RESOURCE_ID
+
+    NAME "Install-Resource (ICC Profile)"
+    OPERATION Install-Resource
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR integer resource-id $ICC_RESOURCE_ID
+
+    STATUS successful-ok
+}
+{
+    SKIP-IF-NOT-DEFINED HAVE_ICC
+    SKIP-IF-NOT-DEFINED ICC_RESOURCE_ID
+
+    NAME "Get-Resource-Attributes (ICC Profile)"
+    OPERATION Get-Resource-Attributes
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri system-uri $uri
+    ATTR integer resource-id $ICC_RESOURCE_ID
+    ATTR keyword requested-attributes resource-description,resource-status
+
+    STATUS successful-ok
+
+    EXPECT date-time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE no-value COUNT 1
+    EXPECT date-time-at-creation IN-GROUP resource-attributes-tag OF-TYPE dateTime COUNT 1
+    EXPECT date-time-at-installed IN-GROUP resource-attributes-tag OF-TYPE dateTime COUNT 1
+    EXPECT resource-data-uri IN-GROUP resource-attributes-tag OF-TYPE uri COUNT 1
+    EXPECT resource-format IN-GROUP resource-attributes-tag OF-TYPE mimeMediaType COUNT 1 WITH-VALUE application/vnd.iccprofile
+    EXPECT resource-id IN-GROUP resource-attributes-tag OF-TYPE integer(1:MAX) COUNT 1 WITH-VALUE $ICC_RESOURCE_ID
+    EXPECT resource-info IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1 WITH-VALUE "5100.22 sRGB ICC Profile Resource"
+    EXPECT resource-k-octets IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1 WITH-VALUE 1
+    EXPECT resource-name IN-GROUP resource-attributes-tag OF-TYPE name COUNT 1 WITH-VALUE "sRGB ICC Profile"
+    EXPECT ?resource-natural-language IN-GROUP resource-attributes-tag OF-TYPE naturalLanguage COUNT 1
+    EXPECT ?resource-patches IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT ?resource-signature IN-GROUP resource-attributes-tag OF-TYPE octetString
+    EXPECT resource-state IN-GROUP resource-attributes-tag OF-TYPE enum COUNT 1 WITH-VALUE 5
+    EXPECT resource-state-message IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1
+    EXPECT resource-state-reasons IN-GROUP resource-attributes-tag OF-TYPE keyword
+    EXPECT resource-string-version IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT resource-type IN-GROUP resource-attributes-tag OF-TYPE keyword COUNT 1 WITH-VALUE "static-icc-profile"
+    EXPECT resource-use-count IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1 WITH-VALUE 0
+    EXPECT resource-uuid IN-GROUP resource-attributes-tag OF-TYPE uri COUNT 1
+    EXPECT resource-version IN-GROUP resource-attributes-tag OF-TYPE octetString(64)|no-value COUNT 1
+    EXPECT time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE no-value COUNT 1
+    EXPECT time-at-creation IN-GROUP resource-attributes-tag OF-TYPE integer COUNT 1
+    EXPECT time-at-installed IN-GROUP resource-attributes-tag OF-TYPE integer COUNT 1
+}
+{
+    SKIP-IF-NOT-DEFINED HAVE_ICC
+    SKIP-IF-NOT-DEFINED ICC_RESOURCE_ID
+
+    NAME "Allocate-Printer-Resources (ICC Profile)"
+    OPERATION Allocate-Printer-Resources
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $PRINTER_URI
+	ATTR integer resource-ids $ICC_RESOURCE_ID
+
+    STATUS successful-ok
+}
+{
+    SKIP-IF-NOT-DEFINED HAVE_ICC
+    SKIP-IF-NOT-DEFINED ICC_RESOURCE_ID
+
+    NAME "Get-Resource-Attributes (ICC Profile)"
+    OPERATION Get-Resource-Attributes
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri system-uri $uri
+    ATTR integer resource-id $ICC_RESOURCE_ID
+    ATTR keyword requested-attributes resource-use-count
+
+    STATUS successful-ok
+
+    EXPECT !date-time-at-canceled
+    EXPECT !date-time-at-creation
+    EXPECT !date-time-at-installed
+    EXPECT !resource-data-uri
+    EXPECT !resource-format
+    EXPECT !resource-id
+    EXPECT !resource-info
+    EXPECT !resource-k-octets
+    EXPECT !resource-name
+    EXPECT !resource-natural-language
+    EXPECT !resource-patches
+    EXPECT !resource-signature
+    EXPECT !resource-state
+    EXPECT !resource-state-message
+    EXPECT !resource-state-reasons
+    EXPECT !resource-string-version
+    EXPECT !resource-type
+    EXPECT resource-use-count IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1 WITH-VALUE 1
+    EXPECT !resource-uuid
+    EXPECT !resource-version
+    EXPECT !time-at-canceled
+    EXPECT !time-at-creation
+    EXPECT !time-at-installed
+}
+
+{
+    SKIP-IF-NOT-DEFINED HAVE_STRINGS
+
+    NAME "Create-Resource (English Strings)"
+    OPERATION Create-Resource
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR keyword resource-type static-image
+    GROUP resource-attributes-tag
+	ATTR name resource-name "English Strings"
+	ATTR text resource-info "5100.22 English Strings Resource"
+
+    STATUS successful-ok
+    EXPECT resource-id IN-GROUP resource-attributes-tag OF-TYPE integer(1:MAX) COUNT 1
+    EXPECT resource-id DEFINE-VALUE STRINGS_RESOURCE_ID
+}
+{
+    SKIP-IF-NOT-DEFINED HAVE_STRINGS
+    SKIP-IF-NOT-DEFINED STRINGS_RESOURCE_ID
+
+    NAME "Send-Resource-Data (English Strings)"
+    OPERATION Send-Resource-Data
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR integer resource-id $STRINGS_RESOURCE_ID
+	ATTR mimeMediaType resource-format text/strings
+    FILE en.strings
+
+    STATUS successful-ok
+}
+{
+    SKIP-IF-NOT-DEFINED HAVE_STRINGS
+    SKIP-IF-NOT-DEFINED STRINGS_RESOURCE_ID
+
+    NAME "Install-Resource (English Strings)"
+    OPERATION Install-Resource
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR integer resource-id $STRINGS_RESOURCE_ID
+
+    STATUS successful-ok
+}
+{
+    SKIP-IF-NOT-DEFINED HAVE_STRINGS
+    SKIP-IF-NOT-DEFINED STRINGS_RESOURCE_ID
+
+    NAME "Allocate-Printer-Resources (English Strings)"
+    OPERATION Allocate-Printer-Resources
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $PRINTER_URI
+	ATTR integer resource-ids $STRINGS_RESOURCE_ID
+
+    STATUS successful-ok
+}
+
+{
+    NAME "Get-Printer-Resources (Resource Printer)"
+    OPERATION Get-Printer-Resources
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $PRINTER_URI
+
+    STATUS successful-ok
+    EXPECT-ALL resource-id IN-GROUP resource-attributes-tag OF-TYPE integer(1:MAX) COUNT 1
+    EXPECT-ALL resource-state IN-GROUP resource-attributes-tag OF-TYPE enum COUNT 1
+    EXPECT-ALL resource-state-reasons IN-GROUP resource-attributes-tag OF-TYPE keyword
+    EXPECT-ALL resource-uuid IN-GROUP resource-attributes-tag OF-TYPE uri COUNT 1
+}
+
+{
+    NAME "Delete-Printer (Resource Printer)"
+    OPERATION Delete-Printer
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR integer printer-id $PRINTER_ID
+
+    STATUS successful-ok
+}
+
+{
+    SKIP-IF-NOT-DEFINED ICON_RESOURCE_ID
+
+    NAME "Set-Resource-Attributes (Icon Image)"
+    OPERATION Set-Resource-Attributes
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR integer resource-id $ICON_RESOURCE_ID
+    GROUP resource-attributes-tag
+        ATTR text resource-info "PWG 5100.22 New Icon Image"
+
+    STATUS successful-ok
+}
+{
+    SKIP-IF-NOT-DEFINED ICON_RESOURCE_ID
+
+    NAME "Get-Resource-Attributes (Icon Image)"
+    OPERATION Get-Resource-Attributes
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR integer resource-id $ICON_RESOURCE_ID
+	ATTR keyword requested-attributes resource-info
+
+    STATUS successful-ok
+    EXPECT !resource-id
+    EXPECT resource-info WITH-VALUE "PWG 5100.22 New Icon Image"
+}
+{
+    SKIP-IF-NOT-DEFINED ICON_RESOURCE_ID
+
+    NAME "Cancel-Resource (Icon Image)"
+    OPERATION Cancel-Resource
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR integer resource-id $ICON_RESOURCE_ID
+
+    STATUS successful-ok
+}
+
+{
+    SKIP-IF-NOT-DEFINED ICC_RESOURCE_ID
+
+    NAME "Cancel-Resource (ICC Profile)"
+    OPERATION Cancel-Resource
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR integer resource-id $ICC_RESOURCE_ID
+
+    STATUS successful-ok
+}
+{
+    SKIP-IF-NOT-DEFINED HAVE_ICC
+    SKIP-IF-NOT-DEFINED ICC_RESOURCE_ID
+
+    NAME "Get-Resource-Attributes (ICC Profile)"
+    OPERATION Get-Resource-Attributes
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri system-uri $uri
+    ATTR integer resource-id $ICC_RESOURCE_ID
+    ATTR keyword requested-attributes resource-status
+
+    STATUS successful-ok
+
+    EXPECT date-time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE dateTime COUNT 1
+    EXPECT date-time-at-creation IN-GROUP resource-attributes-tag OF-TYPE dateTime COUNT 1
+    EXPECT date-time-at-installed IN-GROUP resource-attributes-tag OF-TYPE no-value COUNT 1
+    EXPECT resource-data-uri IN-GROUP resource-attributes-tag OF-TYPE uri COUNT 1
+    EXPECT resource-format IN-GROUP resource-attributes-tag OF-TYPE mimeMediaType COUNT 1 WITH-VALUE application/vnd.iccprofile
+    EXPECT resource-id IN-GROUP resource-attributes-tag OF-TYPE integer(1:MAX) COUNT 1 WITH-VALUE $ICC_RESOURCE_ID
+    EXPECT !resource-info
+    EXPECT resource-k-octets IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1 WITH-VALUE 1
+    EXPECT !resource-name
+    EXPECT ?resource-natural-language IN-GROUP resource-attributes-tag OF-TYPE naturalLanguage COUNT 1
+    EXPECT ?resource-patches IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT ?resource-signature IN-GROUP resource-attributes-tag OF-TYPE octetString
+    EXPECT resource-state IN-GROUP resource-attributes-tag OF-TYPE enum COUNT 1 WITH-VALUE 6
+    EXPECT resource-state-message IN-GROUP resource-attributes-tag OF-TYPE text COUNT 1
+    EXPECT resource-state-reasons IN-GROUP resource-attributes-tag OF-TYPE keyword
+    EXPECT resource-string-version IN-GROUP resource-attributes-tag OF-TYPE text|no-value COUNT 1
+    EXPECT resource-type IN-GROUP resource-attributes-tag OF-TYPE keyword COUNT 1 WITH-VALUE "static-icc-profile"
+    EXPECT resource-use-count IN-GROUP resource-attributes-tag OF-TYPE integer(0:MAX) COUNT 1 WITH-VALUE 0
+    EXPECT resource-uuid IN-GROUP resource-attributes-tag OF-TYPE uri COUNT 1
+    EXPECT resource-version IN-GROUP resource-attributes-tag OF-TYPE octetString(64)|no-value COUNT 1
+    EXPECT time-at-canceled IN-GROUP resource-attributes-tag OF-TYPE integer COUNT 1
+    EXPECT time-at-creation IN-GROUP resource-attributes-tag OF-TYPE integer COUNT 1
+    EXPECT time-at-installed IN-GROUP resource-attributes-tag OF-TYPE no-value COUNT 1
+}
+
+{
+    SKIP-IF-NOT-DEFINED STRINGS_RESOURCE_ID
+
+    NAME "Cancel-Resource (English Strings)"
+    OPERATION Cancel-Resource
+    GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri system-uri $uri
+	ATTR integer resource-id $STRINGS_RESOURCE_ID
+
+    STATUS successful-ok
+}

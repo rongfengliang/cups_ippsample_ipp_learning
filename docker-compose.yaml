@@ -1,0 +1,37 @@
+version: "3"
+services:
+  ippserver:
+    image: dalongrong/ippserver
+    hostname: ippserver
+    volumes:
+      - ./test:/config
+      - ./data/print:/print
+      - ./data/spool:/spool
+      - ./data/tools:/tools
+    command: ippserver -C /config -r _print
+  ippfind:
+    image: dalongrong/ippfind
+    command: ippfind
+    depends_on:
+      - "ippserver"
+  ipptest:
+    image:  dalongrong/ipptest
+    volumes:
+      - ./examples:/examples
+    working_dir: /examples
+    command: ipptool -V 2.0 -tf document-letter.pdf ipp://ippserver:8000/ipp/print/foo ipp-everywhere.test
+    depends_on:
+      - "ippserver"
+  ippproxy:
+    image: dalongrong/ippproxy
+    command: ippproxy -d ipp://ippserver:8000/ipp/print/foo ipp://ippserver:8000/ipp/print/bar
+    depends_on:
+      - "ippserver"
+  cups:
+    image: olbat/cupsd
+    privileged: true
+    ports:
+      - "632:631"
+    volumes:
+      - ./cupsd.conf:/etc/cups/cupsd.conf
+      - /var/run/dbus:/var/run/dbus

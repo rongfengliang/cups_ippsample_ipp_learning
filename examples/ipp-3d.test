@@ -1,0 +1,1624 @@
+#
+# IPP 3D test suite.
+#
+# Copyright © 2017-2019 by Apple Inc.
+#
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+# information.
+#
+# Usage:
+#
+#   ./ipptool -V 2.0 -tf filename.3mf printer-uri ipp-3d.test
+#
+
+# Test required IPP operations (section 6.3 of PWG 5100.21)
+{
+	NAME "PWG 5100.21 - Section 6.3 IPP Operations"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR mimeMediaType document-format application/octet-stream
+	ATTR keyword requested-attributes operations-supported
+
+	STATUS successful-ok
+
+	# Operations
+	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag
+	EXPECT !operations-supported WITH-VALUE 0x0002 # Print-Job not supported
+	EXPECT !operations-supported WITH-VALUE 0x0003 # Print-URI not supported
+	EXPECT operations-supported WITH-VALUE 0x0004 # Validate-Job
+	EXPECT operations-supported WITH-VALUE 0x0005 # Create-Job
+	EXPECT operations-supported WITH-VALUE 0x0006 # Send-Document
+	EXPECT operations-supported WITH-VALUE 0x0008 # Cancel-Job
+	EXPECT operations-supported WITH-VALUE 0x0009 # Get-Job-Attributes
+	EXPECT operations-supported WITH-VALUE 0x000a # Get-Jobs
+	EXPECT operations-supported WITH-VALUE 0x000b # Get-Printer-Attributes
+	EXPECT operations-supported WITH-VALUE 0x0039 # Cancel-My-Jobs
+	EXPECT operations-supported WITH-VALUE 0x003b # Close-Job
+	EXPECT operations-supported WITH-VALUE 0x003c # Identify-Printer
+}
+
+
+# Test required Printer Description Attributes
+{
+	NAME "PWG 5100.21 - Section 6.5 IPP Printer Description Attributes"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR mimeMediaType document-format application/octet-stream
+	ATTR keyword requested-attributes all
+
+	STATUS successful-ok
+
+	# Unconditionally required Printer Description attributes
+	EXPECT accuracy-units-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^(mm|nm|um)\$/"
+
+	EXPECT charset-configured OF-TYPE charset IN-GROUP printer-attributes-tag
+	EXPECT charset-supported OF-TYPE charset IN-GROUP printer-attributes-tag WITH-VALUE "utf-8"
+
+	EXPECT color-supported OF-TYPE boolean IN-GROUP printer-attributes-tag
+
+	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "none"
+
+	EXPECT document-format-default OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "model/3mf"
+
+	EXPECT generated-natural-language-supported OF-TYPE naturalLanguage IN-GROUP printer-attributes-tag
+
+	EXPECT identify-actions-default OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT identify-actions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT ipp-features-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "ipp-3d"
+
+	EXPECT ipp-versions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "2.0"
+
+	EXPECT job-creation-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT job-ids-supported OF-TYPE boolean IN-GROUP printer-attributes-tag WITH-VALUE true
+
+	EXPECT ?material-amount-units-supported OF-TYPE keyword WITH-VALUE "/^(g|kg|l|ml|mm)\$/"
+
+	EXPECT ?material-diameter-supported OF-TYPE integer|rangeOfInteger IN-GROUP printer-attributes-tag
+
+	EXPECT material-purpose-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT ?material-rate-supported OF-TYPE integer|rangeOfInteger IN-GROUP printer-attributes-tag
+	EXPECT ?material-rate-units-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT material-shell-thickness-supported OF-TYPE integer|rangeOfInteger IN-GROUP printer-attributes-tag
+
+	EXPECT ?material-temperature-supported OF-TYPE integer|rangeOfInteger IN-GROUP printer-attributes-tag
+
+	EXPECT material-type-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag
+
+	EXPECT ?materials-col-database OF-TYPE collection IN-GROUP printer-attributes-tag
+
+	EXPECT materials-col-default OF-TYPE collection IN-GROUP printer-attributes-tag
+	EXPECT materials-col-default/material-key OF-TYPE keyword
+	EXPECT materials-col-default/material-name OF-TYPE name
+	EXPECT materials-col-default/material-type OF-TYPE keyword|name
+	EXPECT materials-col-default/material-fill-density OF-TYPE integer
+	EXPECT materials-col-default/material-purpose OF-TYPE keyword|name
+	EXPECT materials-col-default/material-shell-thickness OF-TYPE integer
+
+	EXPECT materials-col-ready OF-TYPE collection IN-GROUP printer-attributes-tag
+	EXPECT materials-col-ready/material-key OF-TYPE keyword
+	EXPECT materials-col-ready/material-name OF-TYPE name
+	EXPECT materials-col-ready/material-type OF-TYPE keyword|name
+
+	EXPECT material-diameter-ready IF-DEFINED HAVE_MATERIAL_DIAMETER DEFINE-VALUE MATERIAL_DIAMETER
+	EXPECT materials-col-ready/material-type WITH-VALUE "pla" DEFINE-MATCH SUPPORTS_PLA_MATERIAL
+	EXPECT materials-col-ready/material-type WITH-VALUE "abs" DEFINE-MATCH SUPPORTS_ABS_MATERIAL
+
+ 	EXPECT materials-col-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT materials-col-supported WITH-VALUE "material-fill-density"
+	EXPECT materials-col-supported WITH-VALUE "material-key"
+	EXPECT materials-col-supported WITH-VALUE "material-name"
+	EXPECT materials-col-supported WITH-VALUE "material-purpose"
+	EXPECT materials-col-supported WITH-VALUE "material-shell-thickness"
+	EXPECT materials-col-supported WITH-VALUE "material-type"
+
+
+	EXPECT max-materials-col-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-VALUE >0
+
+	EXPECT multiple-document-jobs-supported OF-TYPE boolean IN-GROUP printer-attributes-tag
+
+	EXPECT ?multiple-object-handling-default OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT ?multiple-object-handling-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT multiple-operation-time-out OF-TYPE integer IN-GROUP printer-attributes-tag
+
+	EXPECT multiple-operation-time-out-action OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT natural-language-configured OF-TYPE naturalLanguage IN-GROUP printer-attributes-tag
+
+	EXPECT ?pdf-features-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT ?platform-temperature-default OF-TYPE integer IN-GROUP printer-attributes-tag
+	EXPECT ?platform-temperature-supported OF-TYPE integer|rangeOfInteger IN-GROUP printer-attributes-tag
+
+	EXPECT print-accuracy-default OF-TYPE collection IN-GROUP printer-attributes-tag
+	EXPECT print-accuracy-default/accuracy-units OF-TYPE keyword
+	EXPECT print-accuracy-default/x-accuracy OF-TYPE integer
+	EXPECT print-accuracy-default/y-accuracy OF-TYPE integer
+	EXPECT print-accuracy-default/z-accuracy OF-TYPE integer
+	EXPECT print-accuracy-supported OF-TYPE collection IN-GROUP printer-attributes-tag
+	EXPECT print-accuracy-supported/accuracy-units OF-TYPE keyword
+	EXPECT print-accuracy-supported/x-accuracy OF-TYPE integer
+	EXPECT print-accuracy-supported/y-accuracy OF-TYPE integer
+	EXPECT print-accuracy-supported/z-accuracy OF-TYPE integer
+
+	EXPECT print-accuracy-default/accuracy-units WITH-VALUE "mm" DEFINE-MATCH SUPPORTS_MM_UNIT
+
+	EXPECT print-base-default OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT print-base-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT print-base-supported OF-TYPE keyword WITH-VALUE "none"
+
+	EXPECT ?print-objects-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT print-quality-default OF-TYPE enum IN-GROUP printer-attributes-tag
+	EXPECT print-quality-supported OF-TYPE enum IN-GROUP printer-attributes-tag
+
+	EXPECT print-supports-default OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT print-supports-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT print-supports-supported OF-TYPE keyword WITH-VALUE "none"
+
+	EXPECT printer-geo-location OF-TYPE unknown|uri IN-GROUP printer-attributes-tag
+
+	EXPECT printer-get-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT printer-icons OF-TYPE uri IN-GROUP printer-attributes-tag
+
+	EXPECT printer-info OF-TYPE text IN-GROUP printer-attributes-tag
+
+	EXPECT printer-location OF-TYPE text IN-GROUP printer-attributes-tag
+
+	EXPECT printer-make-and-model OF-TYPE text IN-GROUP printer-attributes-tag
+
+	EXPECT printer-more-info OF-TYPE uri IN-GROUP printer-attributes-tag
+
+	EXPECT printer-name OF-TYPE name IN-GROUP printer-attributes-tag
+
+	EXPECT printer-organization OF-TYPE text IN-GROUP printer-attributes-tag
+
+	EXPECT printer-organizational-unit OF-TYPE text IN-GROUP printer-attributes-tag
+
+	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT printer-volume-supported OF-TYPE collection IN-GROUP printer-attributes-tag
+	EXPECT printer-volume-supported/x-dimension OF-TYPE integer WITH-VALUE >0
+	EXPECT printer-volume-supported/y-dimension OF-TYPE integer WITH-VALUE >0
+	EXPECT printer-volume-supported/z-dimension OF-TYPE integer WITH-VALUE >0
+
+	EXPECT printer-xri-supported OF-TYPE collection IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-uri-supported
+	EXPECT printer-xri-supported/xri-authentication OF-TYPE keyword WITH-VALUE-FROM uri-authentication-supported
+	EXPECT printer-xri-supported/xri-security OF-TYPE keyword WITH-VALUE-FROM uri-security-supported
+	EXPECT printer-xri-supported/xri-uri OF-TYPE uri WITH-VALUE-FROM printer-uri-supported
+
+	EXPECT which-jobs-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+
+	# Conditional stuff...
+	EXPECT document-format-supported WITH-VALUE "application/pdf" DEFINE-MATCH HAVE_PDF
+
+	EXPECT pdf-features-supported IF-DEFINED HAVE_PDF
+	EXPECT pdf-features-supported WITH-VALUE "/^(prc|u3d)\$/" IF-DEFINED HAVE_PDF
+
+	EXPECT print-objects-supported IF-DEFINED HAVE_PDF
+	EXPECT print-objects-supported WITH-VALUE "document-number" IF-DEFINED HAVE_PDF
+	EXPECT print-objects-supported WITH-VALUE "object-offset" IF-DEFINED HAVE_PDF
+	EXPECT print-objects-supported WITH-VALUE "object-size" IF-DEFINED HAVE_PDF
+	EXPECT print-objects-supported WITH-VALUE "object-uuid" IF-DEFINED HAVE_PDF
+
+	EXPECT multiple-object-handling-default IF-DEFINED HAVE_PDF
+
+	EXPECT multiple-object-handling-supported IF-DEFINED HAVE_PDF
+
+	EXPECT materials-col-supported WITH-VALUE "material-amount" DEFINE-MATCH HAVE_MATERIAL_AMOUNT
+	EXPECT materials-col-supported WITH-VALUE "material-amount-units" IF-DEFINED HAVE_MATERIAL_AMOUNT
+	EXPECT materials-col-supported WITH-VALUE "material-diameter" DEFINE-MATCH HAVE_MATERIAL_DIAMETER
+	EXPECT materials-col-supported WITH-VALUE "material-rate" DEFINE-MATCH HAVE_MATERIAL_RATE
+	EXPECT materials-col-supported WITH-VALUE "material-rate-units" IF-DEFINED HAVE_MATERIAL_RATE
+	EXPECT materials-col-supported WITH-VALUE "material-temperature" DEFINE-MATCH HAVE_MATERIAL_TEMPERATURE
+
+	EXPECT materials-col-supported WITH-VALUE "materials-color" DEFINE-MATCH HAVE_MATERIAL_COLOR
+
+	EXPECT materials-col-supported WITH-VALUE "material-diameter" IF-DEFINED USES_FILAMENT_MATERIAL  #Printers that use filament material must support this attribute.
+	EXPECT materials-col-supported WITH-VALUE "material-temperature" IF-DEFINED SUPPORTS_MATERIAL_TEMPERATURE_CONTROL
+
+	EXPECT material-amount-units-supported IF-DEFINED HAVE_MATERIAL_AMOUNT
+
+	EXPECT material-diameter-supported IF-DEFINED HAVE_MATERIAL_DIAMETER
+
+	EXPECT material-rate-supported IF-DEFINED HAVE_MATERIAL_RATE
+	EXPECT material-rate-units-supported IF-DEFINED HAVE_MATERIAL_RATE
+
+	EXPECT material-temperature-supported IF-DEFINED HAVE_MATERIAL_TEMPERATURE
+
+	EXPECT platform-temperature-supported DEFINE-MATCH HAVE_PLATFORM_TEMPERATURE
+	EXPECT platform-temperature-default IF-DEFINED HAVE_PLATFORM_TEMPERATURE
+
+	# Job template attributes for specific tests
+	EXPECT multiple-object-handling WITH-VALUE "auto" DEFINE-MATCH OPTIONAL_AUTO_MUTIPLE_OBJECT_HANDLING
+	EXPECT multiple-object-handling WITH-VALUE "best-fit" DEFINE-MATCH OPTIONAL_BESTFIT_MUTIPLE_OBJECT_HANDLING
+	EXPECT multiple-object-handling WITH-VALUE "best-quality" DEFINE-MATCH OPTIONAL_BESTQUALITY_MUTIPLE_OBJECT_HANDLING
+	EXPECT multiple-object-handling WITH-VALUE "best-speed" DEFINE-MATCH OPTIONAL_BESTSPEED_MUTIPLE_OBJECT_HANDLING
+	EXPECT multiple-object-handling WITH-VALUE "one-at-a-time" DEFINE-MATCH OPTIONAL_ONEATATIME_MUTIPLE_OBJECT_HANDLING
+	EXPECT print-supports-supported WITH-VALUE "none" DEFINE-MATCH OPTIONAL_STANDARD_PRINTSUPPORTS
+	EXPECT print-supports-supported WITH-VALUE "material" DEFINE-MATCH OPTIONAL_NONE_PRINTSUPPORTS
+	EXPECT print-supports-supported WITH-VALUE "standard" DEFINE-MATCH OPTIONAL_MATERIAL_PRINTSUPPORTS
+	EXPECT print-base WITH-VALUE "standard" DEFINE-MATCH OPTIONAL_STANDARD_PRINTBASE
+	EXPECT print-base WITH-VALUE "none" DEFINE-MATCH OPTIONAL_NONE_PRINTBASE
+	EXPECT print-base WITH-VALUE "brim" DEFINE-MATCH OPTIONAL_BRIM_PRINTBASE
+	EXPECT print-base WITH-VALUE "raft" DEFINE-MATCH OPTIONAL_RAFT_PRINTBASE
+	EXPECT print-base WITH-VALUE "skirt" DEFINE-MATCH OPTIONAL_SKIRT_PRINTBASE
+
+
+
+}
+
+
+# Test required Printer Status Attributes
+{
+	NAME "PWG 5100.21 - Section 6.6 IPP Printer Status Attributes"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR mimeMediaType document-format application/octet-stream
+	ATTR keyword requested-attributes all
+
+	STATUS successful-ok
+
+	# Printer Status attributes
+	EXPECT ?printer-camera-image-uri OF-TYPE uri IN-GROUP printer-attributes-tag
+	EXPECT printer-config-change-date-time OF-TYPE dateTime IN-GROUP printer-attributes-tag
+	EXPECT printer-config-change-time OF-TYPE integer IN-GROUP printer-attributes-tag WITH-VALUE >-1
+	EXPECT printer-is-accepting-jobs OF-TYPE boolean IN-GROUP printer-attributes-tag
+	EXPECT printer-state OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
+	EXPECT printer-state-change-date-time OF-TYPE dateTime IN-GROUP printer-attributes-tag
+	EXPECT printer-state-change-time OF-TYPE integer IN-GROUP printer-attributes-tag WITH-VALUE >-1
+	EXPECT printer-up-time OF-TYPE integer IN-GROUP printer-attributes-tag WITH-VALUE >0
+	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-xri-supported
+	EXPECT printer-uuid OF-TYPE uri IN-GROUP printer-attributes-tag WITH-VALUE "/^urn:uuid:/"
+	EXPECT queued-job-count OF-TYPE integer IN-GROUP printer-attributes-tag WITH-VALUE >-1
+	EXPECT uri-authentication-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT uri-security-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT xri-authentication-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT xri-security-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT xri-uri-scheme-supported OF-TYPE uriScheme IN-GROUP printer-attributes-tag
+	EXPECT xri-uri-scheme-supported WITH-VALUE "ipps"
+}
+
+
+# Test required Job Template Attributes
+{
+	NAME "PWG 5100.21 - Section 6.7 IPP Job Template Attributes"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR mimeMediaType document-format application/octet-stream
+	ATTR keyword requested-attributes all
+
+	STATUS successful-ok
+
+	# Job Template attributes
+	EXPECT job-creation-attributes-supported WITH-VALUE "materials-col"
+	EXPECT job-creation-attributes-supported WITH-VALUE "multiple-object-handling" IF-DEFINED HAVE_PDF
+	EXPECT job-creation-attributes-supported WITH-VALUE "platform-temperature" IF-DEFINED HAVE_PLATFORM_TEMPERATURE
+	EXPECT job-creation-attributes-supported WITH-VALUE "print-accuracy"
+	EXPECT job-creation-attributes-supported WITH-VALUE "print-base"
+	EXPECT job-creation-attributes-supported WITH-VALUE "print-objects" IF-DEFINED HAVE_PDF
+	EXPECT job-creation-attributes-supported WITH-VALUE "print-quality"
+	EXPECT job-creation-attributes-supported WITH-VALUE "print-supports"
+}
+
+
+# Create a test job and wait for completion...
+{
+	NAME "Create-Job: IPP 3D Test Job"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "IPP 3D Test Job"
+
+	STATUS successful-ok
+
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+{
+	NAME "Send-Document: IPP 3D Test Document"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name "IPP 3D Test Document"
+	ATTR mimeMediaType document-format "model/3mf"
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+}
+{
+	DELAY 30
+
+	NAME "Get-Job-Attributes: Wait for Completion"
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR keyword requested-attributes job-state
+
+	STATUS successful-ok
+
+    # Repeat while we are not canceled, aborted, or completed...
+	EXPECT job-state OF-TYPE enum IN-GROUP job-attributes-tag WITH-VALUE <7 REPEAT-MATCH
+}
+
+
+# Test required Job Description/Status Attributes
+{
+	NAME "PWG 5100.21 - Section 6.8/6.9 IPP Job Description/Status Attributes"
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR keyword requested-attributes all
+
+	STATUS successful-ok
+
+	# Job Status attributes
+	EXPECT date-time-at-completed OF-TYPE dateTime IN-GROUP job-attributes-tag
+	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag
+	EXPECT date-time-at-processing OF-TYPE dateTime IN-GROUP job-attributes-tag
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag WITH-VALUE "IPP 3D Test Job"
+	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag
+	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag WITH-VALUE "$uri"
+	EXPECT job-state OF-TYPE enum IN-GROUP job-attributes-tag WITH-VALUE 9 # completed
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag
+	EXPECT job-uuid OF-TYPE uri IN-GROUP job-attributes-tag WITH-VALUE "/^urn:uuid:/"
+	EXPECT materials-col-actual OF-TYPE collection IN-GROUP job-attributes-tag
+	EXPECT multiple-object-handling-actual OF-TYPE collection IN-GROUP job-attributes-tag IF-DEFINED HAVE_PDF
+	EXPECT platform-temperature-actual OF-TYPE integer IN-GROUP job-attributes-tag IF-DEFINED HAVE_PLATFORM_TEMPERATURE
+	EXPECT print-accuracy-actual OF-TYPE collection IN-GROUP job-attributes-tag
+	EXPECT print-base-actual OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT print-objects-actual OF-TYPE collection IN-GROUP job-attributes-tag IF-DEFINED HAVE_PDF
+	EXPECT print-supports-actual OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT time-at-completed OF-TYPE integer IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT time-at-processing OF-TYPE integer IN-GROUP job-attributes-tag WITH-VALUE >0
+}
+
+# Test Validate-Job operation
+{
+	NAME "Validate-Job Operation"
+	OPERATION Validate-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name $filename
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format $filetype
+
+	STATUS successful-ok
+}
+
+# Test Cancel-Job operation
+{
+	NAME "RFC 8011 section 4.3.3: Cancel-Job Operation (completed job)"
+	OPERATION Cancel-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+
+	STATUS client-error-not-possible
+}
+
+# Create a test job and wait for completion...
+{
+	NAME "Create-Job: IPP 3D Test Job"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "IPP 3D Test Job"
+
+	STATUS successful-ok
+
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+{
+	NAME "Send-Document: IPP 3D Test Document"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name "IPP 3D Test Document"
+	ATTR mimeMediaType document-format "model/3mf"
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+}
+{
+	DELAY 30
+
+	NAME "Get-Job-Attributes: Wait for Completion"
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR keyword requested-attributes job-state
+
+	STATUS successful-ok
+
+	# Repeat while we are not canceled, aborted, or completed...
+	EXPECT job-state OF-TYPE enum IN-GROUP job-attributes-tag WITH-VALUE <7 REPEAT-MATCH
+}
+
+# Test Get-Jobs operation
+{
+	NAME "Get-Jobs Operation (requested-attributes)"
+	OPERATION Get-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR keyword requested-attributes all
+
+	EXPECT date-time-at-completed OF-TYPE dateTime IN-GROUP job-attributes-tag
+	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag
+	EXPECT date-time-at-processing OF-TYPE dateTime IN-GROUP job-attributes-tag
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag WITH-VALUE "IPP 3D Test Job"
+	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag
+	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag WITH-VALUE "$uri"
+	EXPECT job-state OF-TYPE enum IN-GROUP job-attributes-tag WITH-VALUE 9 # completed
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag
+	EXPECT job-uuid OF-TYPE uri IN-GROUP job-attributes-tag WITH-VALUE "/^urn:uuid:/"
+	EXPECT materials-col-actual OF-TYPE collection IN-GROUP job-attributes-tag
+	EXPECT multiple-object-handling-actual OF-TYPE collection IN-GROUP job-attributes-tag IF-DEFINED HAVE_PDF
+	EXPECT platform-temperature-actual OF-TYPE integer IN-GROUP job-attributes-tag IF-DEFINED HAVE_PLATFORM_TEMPERATURE
+	EXPECT print-accuracy-actual OF-TYPE collection IN-GROUP job-attributes-tag
+	EXPECT print-base-actual OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT print-objects-actual OF-TYPE collection IN-GROUP job-attributes-tag IF-DEFINED HAVE_PDF
+	EXPECT print-supports-actual OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT time-at-completed OF-TYPE integer IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT time-at-processing OF-TYPE integer IN-GROUP job-attributes-tag WITH-VALUE >0
+}
+
+# Make the printer display a message and beep
+{
+	# The name of the test...
+	NAME "Identify Printer with Message and Beep"
+
+	# The operation to use
+	OPERATION Identify-Printer
+
+	# Attributes, starting in the operation group...
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR keyword identify-actions sound,display
+	ATTR text message "Hello\, World!"
+
+	# What statuses are OK?
+	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes
+}
+
+
+#Creating jobs. These jobs will be canceled at once by the Cancel-My-Jobs operation below
+# Create a test job 1
+{
+	NAME "Create-Job: IPP 3D Test Job"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "IPP 3D Test Job"
+
+	STATUS successful-ok
+
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0 DEFINE-VALUE JOBID_FIRSTCANCEL
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+# Create a test job 2
+{
+	NAME "Create-Job: IPP 3D Test Job"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "IPP 3D Test Job"
+
+	STATUS successful-ok
+
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0 DEFINE-VALUE JOBID_SECONDCANCEL
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+# Test Cancel-My-Jobs operation
+{
+	NAME "PWG 5100.11 section 5.2: Cancel-My-Jobs Operation"
+	OPERATION Cancel-My-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-ids $JOBID_FIRSTCANCEL, $JOBID_SECONDCANCEL
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	STATUS client-error-not-possible
+	STATUS client-error-not-authorized
+}
+
+
+# Create a test job to be cancelled by the Close-Job operation
+{
+	NAME "Create-Job: IPP 3D Test Job (for Close-Job)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "IPP 3D Test Job"
+
+	STATUS successful-ok
+
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0 DEFINE-VALUE JOBID_CLOSEJOB
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+{
+	NAME "Send-Document: IPP 3D Test Document (last-document='false')"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $JOBID_CLOSEJOB
+	ATTR name requesting-user-name $user
+	ATTR name document-name "IPP 3D Test Document"
+	ATTR mimeMediaType document-format "model/3mf"
+	ATTR boolean last-document false
+
+	FILE $filename
+
+	STATUS successful-ok
+}
+
+# Close-Job operation
+{
+	NAME "Section 5.3 PWG 5100.11: Close-Job Operation"
+	OPERATION Close-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $JOBID_CLOSEJOB
+	ATTR name requesting-user-name $user
+
+
+	STATUS successful-ok
+	STATUS client-error-forbidden
+	STATUS client-error-not-authenticated
+	STATUS client-error-not-authorized
+}
+
+
+# Create a test job using materials-col job-template-attribute (material-type=pla)
+{
+	SKIP-IF-NOT-DEFINED SUPPORTS_PLA_MATERIAL
+	SKIP-IF-NOT-DEFINED MATERIAL_DIAMETER
+
+	NAME "Create-Job: IPP 3D Test Job with materials-col job-template-attribute (material-type=pla)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR collection materials-col {
+		MEMBER keyword material-type "pla"
+		MEMBER integer material-diameter $MATERIAL-DIAMETER
+	}
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED SUPPORTS_PLA_MATERIAL
+	SKIP-IF-NOT-DEFINED MATERIAL_DIAMETER
+
+	NAME "Send-Document: IPP 3D Test Document for test with materials-col job-template-attribute (material-type=pla)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+# Create a test job with materials-col job-template-attribute (material-type=abs)
+{
+	SKIP-IF-NOT-DEFINED SUPPORTS_ABS_MATERIAL
+	SKIP-IF-NOT-DEFINED MATERIAL_DIAMETER
+
+	NAME "Create-Job: IPP 3D Test Job with materials-col job-template-attribute (material-type=abs)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR collection materials-col {
+		MEMBER keyword material-type "abs"
+		MEMBER integer material-diameter $MATERIAL-DIAMETER
+	}
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED SUPPORTS_PLA_MATERIAL
+	SKIP-IF-NOT-DEFINED MATERIAL_DIAMETER
+
+	NAME "Send-Document: IPP 3D Test Document for test with materials-col job-template-attribute (material-type=abs)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+# Create a test job with 'auto' multiple-object-handling
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	SKIP-IF-NOT-DEFINED OPTIONAL_AUTO_MUTIPLE_OBJECT_HANDLING
+
+	NAME "Create-Job: IPP 3D Test Job using mutiple-object-handling job-template-attribute (auto)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword multiple-object-handling "auto"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	SKIP-IF-NOT-DEFINED OPTIONAL_AUTO_MUTIPLE_OBJECT_HANDLING
+
+	NAME "Send-Document: IPP 3D Test Document for test with mutiple-object-handling job-template-attribute (auto)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+# Create a test job with 'best-fit' multiple-object-handling
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	SKIP-IF-NOT-DEFINED OPTIONAL_BESTFIT_MUTIPLE_OBJECT_HANDLING
+
+	NAME "Create-Job: IPP 3D Test Job using mutiple-object-handling job-template-attribute (best-fit)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword multiple-object-handling "best-fit"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	SKIP-IF-NOT-DEFINED OPTIONAL_BESTFIT_MUTIPLE_OBJECT_HANDLING
+
+	NAME "Send-Document: IPP 3D Test Document for test using mutiple-object-handling job-template-attribute (best-fit)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+
+# Create a test job with 'best-quality' multiple-object-handling
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	SKIP-IF-NOT-DEFINED OPTIONAL_BESTQUALITY_MUTIPLE_OBJECT_HANDLING
+
+	NAME "Create-Job: IPP 3D Test Job using mutiple-object-handling job-template-attribute (best-quality)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword multiple-object-handling "best-quality"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	SKIP-IF-NOT-DEFINED OPTIONAL_BESTQUALITY_MUTIPLE_OBJECT_HANDLING
+
+	NAME "Send-Document: IPP 3D Test Document for test using mutiple-object-handling job-template-attribute (best-quality)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+# Create a test job with 'best-speed' multiple-object-handling
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	SKIP-IF-NOT-DEFINED OPTIONAL_BESTSPEED_MUTIPLE_OBJECT_HANDLING
+
+	NAME "Create-Job: IPP 3D Test Job using mutiple-object-handling job-template-attribute (best-speed)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword multiple-object-handling "best-speed"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	SKIP-IF-NOT-DEFINED OPTIONAL_BESTSPEED_MUTIPLE_OBJECT_HANDLING
+
+	NAME "Send-Document: IPP 3D Test Document for test using mutiple-object-handling job-template-attribute (best-speed)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+# Create a test job with 'one-at-a-time' multiple-object-handling
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	SKIP-IF-NOT-DEFINED OPTIONAL_ONEATATIME_MUTIPLE_OBJECT_HANDLING
+
+	NAME "Create-Job: IPP 3D Test Job using mutiple-object-handling job-template-attribute (one-at-a-time)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword multiple-object-handling "one-at-a-time"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	SKIP-IF-NOT-DEFINED OPTIONAL_ONEATATIME_MUTIPLE_OBJECT_HANDLING
+
+	NAME "Send-Document: IPP 3D Test Document for test using mutiple-object-handling job-template-attribute (one-at-a-time)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+#Create a conditional test job with platform-temperature 60 degree c
+{
+	SKIP-IF-NOT-DEFINED HAVE_PLATFORM_TEMPERATURE
+
+	NAME "Create-Job: IPP 3D Test Job using platform-temperature job-template-attribute (60 degree c)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR integer platform-temperature 60
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PLATFORM_TEMPERATURE
+
+	NAME "Send-Document: IPP 3D Test Document for test using mutiple-object-handling job-template-attribute (one-at-a-time)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+
+
+# Create a test job using print-accuracy job-template-attribute (unit =mm, accuracy =0)
+{
+	SKIP-IF-NOT-DEFINED SUPPORTS_MM_UNIT
+
+	NAME "Create-Job: IPP 3D Test Job with printer-accuracy job-template-attribute (unit =mm, accuracy =0)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR collection print-accuracy {
+		MEMBER keyword accuracy-units "mm"
+		MEMBER integer x-accuracy 0
+		MEMBER integer y-accuracy 0
+		MEMBER integer z-accuracy 0
+	}
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED SUPPORTS_MM_UNIT
+
+	NAME "Send-Document: IPP 3D Test Document for test with materials-col job-template-attribute (material-type=pla)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+
+
+
+
+# Create a test job with 'none' print-base
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_NONE_PRINTBASE
+
+	NAME "Create-Job: IPP 3D Test Job using print-base job-template-attribute (none)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword print-base "none"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_NONE_PRINTBASE
+
+	NAME "Send-Document: IPP 3D Test Document for test using print-base job-template-attribute (none)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+# Create a test job with 'brim' print-base
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_BRIM_PRINTBASE
+
+	NAME "Create-Job: IPP 3D Test Job using print-base job-template-attribute (none)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword print-base "brim"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_BRIM_PRINTBASE
+
+	NAME "Send-Document: IPP 3D Test Document for test using print-base job-template-attribute (brim)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+# Create a test job with 'raft' print-base
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_RAFT_PRINTBASE
+
+	NAME "Create-Job: IPP 3D Test Job using print-base job-template-attribute (raft)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword print-base "raft"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_RAFT_PRINTBASE
+
+	NAME "Send-Document: IPP 3D Test Document for test using print-base job-template-attribute (raft)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+# Create a test job with 'skirt' print-base
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_SKIRT_PRINTBASE
+
+	NAME "Create-Job: IPP 3D Test Job using print-base job-template-attribute (skirt)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword print-base "skirt"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_SKIRT_PRINTBASE
+
+	NAME "Send-Document: IPP 3D Test Document for test using print-base job-template-attribute (skirt)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+# Create a test job with 'standard' print-base
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_STANDARD_PRINTBASE
+
+	NAME "Create-Job: IPP 3D Test Job using print-base job-template-attribute (standard)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword print-base "standard"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_STANDARD_PRINTBASE
+
+	NAME "Send-Document: IPP 3D Test Document for test using print-base job-template-attribute (standard)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+# Create a test job with 'standard' print-supports
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_STANDARD_PRINTSUPPORTS
+
+	NAME "Create-Job: IPP 3D Test Job using print-supports job-template-attribute (standard)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword print-supports "standard"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_STANDARD_PRINTSUPPORTS
+
+	NAME "Send-Document: IPP 3D Test Document for test using print-supports job-template-attribute (standard)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+# Create a test job with 'none' print-supports
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_NONE_PRINTSUPPORTS
+
+	NAME "Create-Job: IPP 3D Test Job using print-supports job-template-attribute (none)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword print-supports "none"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_NONE_PRINTSUPPORTS
+
+	NAME "Send-Document: IPP 3D Test Document for test using print-supports job-template-attribute (none)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+
+# Create a test job with 'material' print-supports
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_MATERIAL_PRINTSUPPORTS
+
+	NAME "Create-Job: IPP 3D Test Job using print-supports job-template-attribute (material)"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword print-supports "material"
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+
+}
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_MATERIAL_PRINTSUPPORTS
+
+	NAME "Send-Document: IPP 3D Test Document for test using print-supports job-template-attribute (material)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR mimeMediaType document-format $filetype
+	ATTR boolean last-document true
+
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
